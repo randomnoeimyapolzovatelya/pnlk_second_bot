@@ -1,13 +1,16 @@
 import os
 import telebot
+from flask import Flask, request
 
 # Получаем токен из переменной окружения
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # Создаем веб-сервер для работы на Render
-from flask import Flask, request
 app = Flask(__name__)
+
+# Создаем список для хранения фильмов
+movies = []
 
 @app.route('/')
 def index():
@@ -26,9 +29,27 @@ def webhook():
 def send_welcome(message):
     bot.reply_to(message, "Привет! Я работаю на Render.")
 
-@bot.message_handler(commands=['add'])
-def send_welcome(message):
-    bot.reply_to(message, "Добавить")
+@bot.message_handler(commands=['add_film'])
+def add_film(message):
+    # Получаем текст сообщения после команды
+    try:
+        film_name = message.text.split(' ', 1)[1]
+        if film_name:
+            # Добавляем фильм в список
+            movies.append(film_name)
+            bot.reply_to(message, f"Фильм '{film_name}' успешно добавлен!")
+        else:
+            bot.reply_to(message, "Пожалуйста, укажите название фильма после команды.")
+    except IndexError:
+        bot.reply_to(message, "Не указано название фильма. Используйте: /add_film Название фильма")
+
+@bot.message_handler(commands=['show_films'])
+def show_films(message):
+    if movies:
+        film_list = '\n'.join([f"- {film}" for film in movies])
+        bot.reply_to(message, f"Список фильмов:\n{film_list}")
+    else:
+        bot.reply_to(message, "Список фильмов пуст.")
 
 @bot.message_handler(commands=['first'])
 def send_welcome(message):
