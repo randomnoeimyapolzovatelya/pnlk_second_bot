@@ -26,6 +26,18 @@ def webhook():
 def send_welcome(message):
     bot.reply_to(message, "Привет! Я работаю на Render.")
 
+@bot.message_handler(commands=['add'])
+def send_welcome(message):
+    bot.reply_to(message, "Добавить")
+
+@bot.message_handler(commands=['first'])
+def send_welcome(message):
+    bot.reply_to(message, "first")
+
+@bot.message_handler(commands=['Первый'])
+def send_welcome(message):
+    bot.reply_to(message, "Первый")
+
 # Запуск приложения
 if __name__ == "__main__":
     # Удаляем старый вебхук и устанавливаем новый
